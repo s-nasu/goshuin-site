@@ -190,6 +190,12 @@ app.post('/sites/:id/goshuin', upload.single('image'), async (req, res) => {
 
 
 // --- サーバーの起動 ---
-app.listen(port, () => {
-  console.log(`サーバーが http://localhost:${port} で起動しました`);
-});
+// このファイルが直接実行された場合のみ、サーバーを起動する
+if (require.main === module) {
+  app.listen(port, () => {
+    console.log(`サーバーが http://localhost:${port} で起動しました`);
+  });
+}
+
+// テストのためにappをエクスポートする
+module.exports = app;
