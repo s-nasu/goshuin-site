@@ -2,8 +2,8 @@
 
 全国の寺社でいただいた御朱印を記録・管理するためのウェブアプリケーションです。
 
-![アプリのスクリーンショット](https://via.placeholder.com/600x400?text=Screenshot+Placeholder)
-*(ここにアプリケーションのスクリーンショットを配置します。現在はプレースホルダー画像を表示しています。実際のスクリーンショットは後日追加予定です)*
+![アプリのスクリーンショット](public/images/screenshot.png)
+*(ここにアプリケーションのスクリーンショットを配置します。現在はダミー画像です)*
 
 ## 主な機能
 
@@ -32,8 +32,8 @@
 
 1.  **リポジトリをクローン:**
     ```bash
-    git clone https://github.com/s-nasu/goshuin-site.git
-    cd goshuin-site
+    git clone https://github.com/s-nasu/otomail.git
+    cd otomail
     ```
 
 2.  **依存関係をインストール:**
