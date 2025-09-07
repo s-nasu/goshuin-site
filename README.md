@@ -32,8 +32,8 @@
 
 1.  **リポジトリをクローン:**
     ```bash
-    git clone https://github.com/s-nasu/otomail.git
-    cd otomail
+    git clone https://github.com/s-nasu/goshuin-site.git
+    cd goshuin-site
     ```
 
 2.  **依存関係をインストール:**
