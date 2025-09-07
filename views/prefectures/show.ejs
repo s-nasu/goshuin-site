@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../partials/header') %>
+
+  <main>
+    <h2><%= prefecture.name %> の寺社一覧</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>名前</th>
+          <th>種類</th>
+          <th>アクション</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if(sites.length > 0) { %>
+          <% sites.forEach(function(site) { %>
+            <tr>
+              <td><%= site.name %></td>
+              <td><%= site.type === 'temple' ? 'お寺' : '神社' %></td>
+              <td>
+                <a href="/sites/<%= site.id %>">詳細</a>
+              </td>
+            </tr>
+          <% }); %>
+        <% } else { %>
+          <tr>
+            <td colspan="3">この都道府県にはまだ寺社が登録されていません。</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+    <p style="margin-top: 20px;">
+      <a href="/prefectures">他の都道府県を見る</a>
+    </p>
+  </main>
+</body>
+</html>

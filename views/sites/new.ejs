@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../partials/header') %>
+  <main>
+    <form action="/sites" method="POST">
+      <div class="form-group">
+        <label for="name">名前</label>
+        <input type="text" id="name" name="name" required>
+      </div>
+
+      <div class="form-group">
+        <label for="type">種類</label>
+        <select id="type" name="type" required>
+          <option value="temple">お寺</option>
+          <option value="shrine">神社</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="prefecture_id">都道府県</label>
+        <select id="prefecture_id" name="prefecture_id" required>
+          <% prefectures.forEach(function(pref) { %>
+            <option value="<%= pref.id %>"><%= pref.name %></option>
+          <% }); %>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="address">住所（市区町村以下）</label>
+        <input type="text" id="address" name="address">
+      </div>
+
+      <div class="form-group">
+        <label for="lat">緯度</label>
+        <input type="text" id="lat" name="lat" placeholder="例: 35.681236">
+      </div>
+
+      <div class="form-group">
+        <label for="lng">経度</label>
+        <input type="text" id="lng" name="lng" placeholder="例: 139.767125">
+      </div>
+
+      <div class="form-group">
+        <label for="description">説明・由緒</label>
+        <textarea id="description" name="description" rows="5"></textarea>
+      </div>
+
+      <button type="submit">登録する</button>
+    </form>
+  </main>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../partials/header') %>
+  <main>
+    <section class="site-details">
+      <h2>寺社情報</h2>
+      <p><strong>種類:</strong> <%= site.type === 'temple' ? 'お寺' : '神社' %></p>
+      <p><strong>所在地:</strong> <%= site.prefecture_name %><%= site.address %></p>
+      <% if(site.description) { %>
+        <p><strong>由緒・説明:</strong><br><%= site.description.replace(/\n/g, '<br>') %></p>
+      <% } %>
+      <% if(site.lat && site.lng) { %>
+        <p><a href="https://www.google.com/maps?q=<%= site.lat %>,<%= site.lng %>" target="_blank">Google マップで場所を確認</a></p>
+      <% } %>
+    </section>
+
+    <hr>
+
+    <section class="goshuin-gallery">
+      <h2>御朱印一覧</h2>
+      <% if(goshuin_records.length > 0) { %>
+        <div class="gallery">
+          <% goshuin_records.forEach(function(goshuin) { %>
+            <div class="goshuin-item">
+              <img src="/uploads/<%= goshuin.image_path %>" alt="御朱印" style="width: 100%; max-width: 200px;">
+              <p>参拝日: <%= new Date(goshuin.visit_date).toLocaleDateString('ja-JP') %></p>
+              <% if(goshuin.notes) { %>
+                <p>メモ: <%= goshuin.notes %></p>
+              <% } %>
+            </div>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <p>この寺社の御朱印はまだ登録されていません。</p>
+      <% } %>
+    </section>
+
+    <hr>
+
+    <section class="add-goshuin">
+      <h2>新しい御朱印を登録</h2>
+      <form action="/sites/<%= site.id %>/goshuin" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="image">御朱印の写真</label>
+          <input type="file" id="image" name="image" accept="image/*" required>
+        </div>
+        <div class="form-group">
+          <label for="visit_date">参拝日</label>
+          <input type="date" id="visit_date" name="visit_date" required>
+        </div>
+        <div class="form-group">
+          <label for="notes">メモ</label>
+          <textarea id="notes" name="notes" rows="3"></textarea>
+        </div>
+        <button type="submit">この御朱印を登録する</button>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

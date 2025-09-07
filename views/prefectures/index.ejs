@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .prefecture-list {
+      list-style: none;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 10px;
+    }
+    .prefecture-list a {
+      display: block;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      text-align: center;
+      text-decoration: none;
+      color: #007bff;
+    }
+    .prefecture-list a:hover {
+      background-color: #f1f3f5;
+    }
+  </style>
+</head>
+<body>
+  <%- include('../partials/header') %>
+
+  <main>
+    <h2>都道府県を選択してください</h2>
+    <ul class="prefecture-list">
+      <% prefectures.forEach(function(pref) { %>
+        <li>
+          <a href="/prefectures/<%= pref.id %>/sites"><%= pref.name %></a>
+        </li>
+      <% }); %>
+    </ul>
+  </main>
+</body>
+</html>

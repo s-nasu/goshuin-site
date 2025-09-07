@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/style.css">
+
+  <!-- Leaflet.jsのCSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+
+  <style>
+    #map { height: 600px; } /* 地図の高さを指定 */
+  </style>
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <main>
+    <div id="map"></div>
+  </main>
+
+  <!-- Leaflet.jsのJavaScript -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+
+  <script>
+    // サーバーから渡された寺社データをJavaScriptの変数に代入
+    const sites = <%- JSON.stringify(sites) %>;
+
+    // 地図を初期化。中心は日本の中心あたり、ズームレベル5
+    const map = L.map('map').setView([36.2048, 138.2529], 5);
+
+    // 地図のタイルレイヤーを追加 (OpenStreetMap)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    // 寺社データに基づいてマーカーをプロット
+    sites.forEach(site => {
+      if (site.lat && site.lng) {
+        const marker = L.marker([site.lat, site.lng]).addTo(map);
+
+        // マーカーにポップアップを追加
+        marker.bindPopup(`<b>${site.name}</b><br><a href="/sites/${site.id}">詳細を見る</a>`);
+      }
+    });
+  </script>
+</body>
+</html>
