@@ -1,8 +1,7 @@
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
-exports.seed = async function(knex) {
+import type { Knex } from 'knex';
+import type { Prefecture } from '../../types/db.js';
+
+export async function seed(knex: Knex): Promise<void> {
   // 47都道府県のデータ
   const prefectures = [
     '北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県',
@@ -15,11 +14,11 @@ exports.seed = async function(knex) {
   ];
 
   // knexで扱えるようにデータを整形
-  const data = prefectures.map(name => ({ name: name }));
+  const data: Prefecture[] = prefectures.map(name => ({ name }));
 
   // `prefectures` テーブルの既存データをすべて削除
   await knex('prefectures').del();
 
   // 新しいデータを挿入
   await knex('prefectures').insert(data);
-};
+}

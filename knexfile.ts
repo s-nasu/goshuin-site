@@ -1,5 +1,5 @@
-// knexfile.js
-module.exports = {
+// knex config (ESM)
+const config = {
   development: {
     client: 'sqlite3',
     connection: {
@@ -14,3 +14,5 @@ module.exports = {
     }
   }
 };
+
+export default config;

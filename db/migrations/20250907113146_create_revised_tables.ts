@@ -1,16 +1,14 @@
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
-exports.up = function(knex) {
-  return knex.schema
+import type { Knex } from 'knex';
+
+export async function up(knex: Knex): Promise<void> {
+  await knex.schema
     // 1. 都道府県マスターテーブル (prefectures)
-    .createTable('prefectures', function(table) {
+    .createTable('prefectures', function(table: Knex.CreateTableBuilder) {
       table.increments('id').primary(); // 主キー
       table.string('name', 50).notNullable().unique(); // 都道府県名 (例: 東京都)
     })
     // 2. 寺社テーブル (sites) - 改訂版
-    .createTable('sites', function (table) {
+  .createTable('sites', function (table: Knex.CreateTableBuilder) {
       table.increments('id').primary();
       table.string('name', 255).notNullable();
       table.enum('type', ['temple', 'shrine']).notNullable();
@@ -25,7 +23,7 @@ exports.up = function(knex) {
       table.timestamps(true, true);
     })
     // 3. 御朱印記録テーブル (goshuin_records) - 変更なし
-    .createTable('goshuin_records', function (table) {
+  .createTable('goshuin_records', function (table: Knex.CreateTableBuilder) {
       table.increments('id').primary();
       table.integer('site_id').unsigned().notNullable().references('id').inTable('sites').onDelete('CASCADE');
       table.string('image_path', 255).notNullable();
@@ -33,16 +31,12 @@ exports.up = function(knex) {
       table.text('notes');
       table.timestamps(true, true);
     });
-};
+}
 
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> }
- */
-exports.down = function(knex) {
+export async function down(knex: Knex): Promise<void> {
   // upの逆の順番でテーブルを削除
-  return knex.schema
+  await knex.schema
     .dropTableIfExists('goshuin_records')
     .dropTableIfExists('sites')
     .dropTableIfExists('prefectures');
-};
+}

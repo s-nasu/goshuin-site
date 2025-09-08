@@ -1,5 +1,6 @@
-const request = require('supertest');
-const app = require('../index'); // ../index.jsからappをインポート
+/* Converted to TypeScript */
+import request from 'supertest';
+import app from '../index';
 
 describe('GET /', () => {
   it('should return 200 OK and render the index page', async () => {

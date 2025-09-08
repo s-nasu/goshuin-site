@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm ci
+      - name: Generate DB types
+        run: npm run gen:types
+      - name: Check generated types match committed
+        run: node scripts/check-generated-types.cjs
+      - name: Build
+        run: npm run build
+      - name: Run tests
+        run: NODE_OPTIONS=--experimental-vm-modules npm test

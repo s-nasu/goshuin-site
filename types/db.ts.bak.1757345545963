@@ -1,0 +1,23 @@
+export interface Prefecture {
+  id?: number;
+  name: string;
+}
+
+export interface Site {
+  id?: number;
+  name: string;
+  type: 'temple' | 'shrine';
+  prefecture_id: number;
+  address?: string | null;
+  lat?: number | null;
+  lng?: number | null;
+  description?: string | null;
+}
+
+export interface GoshuinRecord {
+  id?: number;
+  site_id: number;
+  image_path: string;
+  visit_date: string; // ISO date
+  notes?: string | null;
+}
