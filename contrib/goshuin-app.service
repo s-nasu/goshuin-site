@@ -1,0 +1,19 @@
+[Unit]
+Description=Goshuin Logbook Node App
+After=network.target
+
+[Service]
+Type=simple
+# Replace these with your deployment values
+User=www-data
+WorkingDirectory=/var/www/goshuin-site
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/env node /var/www/goshuin-site/dist/index.js
+Restart=on-failure
+RestartSec=5
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=goshuin-app
+
+[Install]
+WantedBy=multi-user.target
