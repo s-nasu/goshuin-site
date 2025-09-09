@@ -4,17 +4,18 @@ Read the English version: `README.en.md`
 
 全国の寺社でいただいた御朱印を記録・管理するためのウェブアプリケーションです。
 
-![アプリのスクリーンショット](public/images/screenshot.png)
-*(ここにアプリケーションのスクリーンショットを配置します。現在はダミー画像です)*
+![アプリのスクリーンショット](public/images/screenshot.png) _(ここにアプリケーションのスクリーンショットを配置します。現在はダミー画像です)_
 
 ## 主な機能
 
 - **寺社管理**:
+
   - 寺社の一覧表示
   - 新しい寺社の登録（名称、種類、都道府県、住所、地図座標、説明）
   - 登録済み寺社の詳細情報の閲覧
 
 - **御朱印の記録**:
+
   - 参拝日、メモ、御朱印の画像をアップロードして記録
   - 寺社ごとに記録した御朱印を一覧表示
 
@@ -33,18 +34,20 @@ Read the English version: `README.en.md`
 ## セットアップと実行方法
 
 1.  **リポジトリをクローン:**
+
     ```bash
     git clone https://github.com/s-nasu/otomail.git
     cd otomail
     ```
 
 2.  **依存関係をインストール:**
+
     ```bash
     npm install
     ```
 
-3.  **データベースのセットアップ:**
-    以下のコマンドを実行して、テーブルを作成し、初期データ（都道府県マスタ）を投入します。
+3.  **データベースのセットアップ:** 以下のコマンドを実行して、テーブルを作成し、初期データ（都道府県マスタ）を投入します。
+
     ```bash
     # データベースのマイグレーションを実行
     npx knex migrate:latest
@@ -52,22 +55,23 @@ Read the English version: `README.en.md`
     # 初期データ（都道府県）を投入
     npx knex seed:run
     ```
+
     これにより、`db/` ディレクトリに `goshuin.sqlite3` というデータベースファイルが生成されます。
 
 4.  **アプリケーションの起動:**
+
     ```bash
     node index.js
     ```
 
-5.  **ブラウザでアクセス:**
-    サーバーが起動したら、ウェブブラウザで `http://localhost:3000` を開いてください。
-
+5.  **ブラウザでアクセス:** サーバーが起動したら、ウェブブラウザで `http://localhost:3000` を開いてください。
 
 ## データベース設計
 
-このアプリケーションは3つの主要なテーブルで構成されています。
+このアプリケーションは 3 つの主要なテーブルで構成されています。
 
-### ER図 (簡易)
+### ER 図 (簡易)
+
 ```
 [prefectures] 1--*< [sites] 1--*< [goshuin_records]
 ```
@@ -75,18 +79,20 @@ Read the English version: `README.en.md`
 ### テーブルスキーマ
 
 #### `prefectures`
+
 都道府県のマスターデータ。
 
-| カラム名 | データ型 | 説明 |
-|---|---|---|
-| `id` | INTEGER | 主キー |
-| `name` | VARCHAR(50) | 都道府県名 (例: 東京都) |
+| カラム名 | データ型    | 説明                    |
+| -------- | ----------- | ----------------------- |
+| `id`     | INTEGER     | 主キー                  |
+| `name`   | VARCHAR(50) | 都道府県名 (例: 東京都) |
 
 #### `sites`
+
 寺社の基本情報。
 
 | カラム名 | データ型 | 説明 |
-|---|---|---|
+| --- | --- | --- |
 | `id` | INTEGER | 主キー |
 | `name` | VARCHAR(255) | 寺社名 |
 | `type` | ENUM('temple', 'shrine') | 種類 (寺 or 神社) |
@@ -99,17 +105,18 @@ Read the English version: `README.en.md`
 | `updated_at` | DATETIME | 更新日時 |
 
 #### `goshuin_records`
+
 参拝して頂いた御朱印の記録。
 
-| カラム名 | データ型 | 説明 |
-|---|---|---|
-| `id` | INTEGER | 主キー |
-| `site_id` | INTEGER | `sites`テーブルへの外部キー |
+| カラム名     | データ型     | 説明                           |
+| ------------ | ------------ | ------------------------------ |
+| `id`         | INTEGER      | 主キー                         |
+| `site_id`    | INTEGER      | `sites`テーブルへの外部キー    |
 | `image_path` | VARCHAR(255) | アップロードされた画像へのパス |
-| `visit_date` | DATE | 参拝日 |
-| `notes` | TEXT | メモ |
-| `created_at` | DATETIME | 作成日時 |
-| `updated_at` | DATETIME | 更新日時 |
+| `visit_date` | DATE         | 参拝日                         |
+| `notes`      | TEXT         | メモ                           |
+| `created_at` | DATETIME     | 作成日時                       |
+| `updated_at` | DATETIME     | 更新日時                       |
 
 ## 今後の方針
 
@@ -137,7 +144,7 @@ CI 自動 PR:
 ポリシーの推奨:
 
 - 生成ファイルを編集しないでください。スキーマの変更はマイグレーションで行い、`npm run gen:types` を通じて型を更新してください。
-- CI は生成型をソース・オブ・トゥルースとみなします。開発フローとしては、スキーマ変更→`npm run gen:types`→ローカルで確認→コミット（または自動 PR で提案）→マージ、を推奨します。
+- CI は生成型をソース・オブ・トゥルースとみなします。開発フローとしては、スキーマ変更 →`npm run gen:types`→ ローカルで確認 → コミット（または自動 PR で提案）→ マージ、を推奨します。
 
 ## デプロイと PM2（運用）
 
@@ -189,6 +196,7 @@ npm run restart:pm2   # 再起動
 ```
 
 注意:
+
 - 本番では `pm2` をグローバルにインストールし、`pm2 startup` → `pm2 save` を行うのが安全です。
 - `ecosystem.config.js` で `out_file`/`error_file` を `./logs/` に設定済みです。`logs/` はリポジトリ内に存在します。
 
