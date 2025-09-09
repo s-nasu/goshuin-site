@@ -7,11 +7,13 @@ A web application to record and manage goshuin (temple/shrine stamps) collected 
 ## Key features
 
 - Temple/shrine management:
+
   - List temples/shrines
   - Register a new site (name, type, prefecture, address, coordinates, description)
   - View site details
 
 - Goshuin records:
+
   - Upload an image, store visit date and notes
   - List records per site
 
@@ -142,6 +144,7 @@ npm run restart:pm2
 ```
 
 Notes:
+
 - We set `out_file`/`error_file` in `ecosystem.config.js` to write logs into `./logs/`. The `logs/` directory exists in the repo.
 - For production, prefer a globally-installed `pm2` and run `pm2 startup` + `pm2 save` to persist the process across reboots.
 - You may also prefer OS-level logrotate instead of the `pm2-logrotate` module depending on your environment.
