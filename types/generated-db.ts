@@ -23,8 +23,8 @@ export interface Sites {
   type: string;
   prefecture_id: number;
   address?: string;
-  lat?: string;
-  lng?: string;
+  lat?: number;
+  lng?: number;
   description?: string;
   created_at: string;
   updated_at: string;
