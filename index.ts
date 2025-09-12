@@ -213,8 +213,8 @@ const shouldListen = process.env.FORCE_LISTEN === '1' ||
   !globalThis.__APP_LISTENING__;
 
 if (shouldListen) {
-  if (!(globalThis as any).__APP_LISTENING__) {
-    (globalThis as any).__APP_LISTENING__ = true;
+  if (!globalThis.__APP_LISTENING__) {
+    globalThis.__APP_LISTENING__ = true;
     app.listen(port, () => {
       console.log(`サーバーが http://localhost:${port} で起動しました`);
     });
