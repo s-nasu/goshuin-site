@@ -19,11 +19,23 @@ const { open } = require('sqlite');
     const fields = [];
     for (const c of cols) {
       const colName = c.name;
-      const colTypeRaw = (c.type || '').toUpperCase();
+      const colTypeRaw = (c.type || '').toUpperCase().trim();
+      // Remove any parameters, e.g. DECIMAL(10,8) -> DECIMAL
+      const colType = colTypeRaw.replace(/\(.+\)/, '').trim();
       let tsType = 'string';
-      if (colTypeRaw.includes('INT')) tsType = 'number';
-      else if (colTypeRaw.includes('DECIMAL') || colTypeRaw.includes('NUM') || colTypeRaw.includes('REAL')) tsType = 'number';
-      else if (colTypeRaw.includes('DATE') || colTypeRaw.includes('TIME')) tsType = 'string';
+      if (
+        colType.includes('INT') ||
+        colType.includes('INTEGER') ||
+        colType.includes('FLOAT') ||
+        colType.includes('DOUBLE') ||
+        colType.includes('DECIMAL') ||
+        colType.includes('NUMERIC') ||
+        colType.includes('REAL')
+      ) {
+        tsType = 'number';
+      } else if (colType.includes('DATE') || colType.includes('TIME')) {
+        tsType = 'string';
+      }
       const optional = c.notnull === 0 ? '?' : '';
       fields.push(`  ${colName}${optional}: ${tsType};`);
     }
