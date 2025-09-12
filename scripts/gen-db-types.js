@@ -10,30 +10,39 @@ const { open } = require('sqlite');
     process.exit(1);
   }
   const db = await open({ filename: dbPath, driver: sqlite3.Database });
-  const rows = await db.all("SELECT name, sql FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';");
+
+  const tables = await db.all("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';");
   const interfaces = [];
-  for (const row of rows) {
-    const name = row.name;
-    const sql = row.sql || '';
-    const colsMatch = sql.match(/\(([\s\S]*)\)/);
-    if (!colsMatch) continue;
-    const colsSql = colsMatch[1];
-    const cols = colsSql.split(/,\s*/).map(s => s.trim()).filter(Boolean);
+  for (const t of tables) {
+    const name = t.name;
+    const cols = await db.all(`PRAGMA table_info(${name});`);
     const fields = [];
-    for (const col of cols) {
-      const m = col.match(/^"?([a-zA-Z0-9_]+)"?\s+([A-Z]+)/i);
-      if (!m) continue;
-      const colName = m[1];
-      const colTypeRaw = m[2].toUpperCase();
+    for (const c of cols) {
+      const colName = c.name;
+      const colTypeRaw = (c.type || '').toUpperCase().trim();
+      // Remove any parameters, e.g. DECIMAL(10,8) -> DECIMAL
+      const colType = colTypeRaw.replace(/\(.+\)/, '').trim();
       let tsType = 'string';
-      if (colTypeRaw.includes('INT')) tsType = 'number';
-      else if (colTypeRaw.includes('DECIMAL') || colTypeRaw.includes('NUM') || colTypeRaw.includes('REAL')) tsType = 'number';
-      else if (colTypeRaw.includes('DATE') || colTypeRaw.includes('TIME')) tsType = 'string';
-      fields.push(`  ${colName}${col.includes('NOT NULL') ? '' : '?'}: ${tsType};`);
+      if (
+        colType.includes('INT') ||
+        colType.includes('INTEGER') ||
+        colType.includes('FLOAT') ||
+        colType.includes('DOUBLE') ||
+        colType.includes('DECIMAL') ||
+        colType.includes('NUMERIC') ||
+        colType.includes('REAL')
+      ) {
+        tsType = 'number';
+      } else if (colType.includes('DATE') || colType.includes('TIME')) {
+        tsType = 'string';
+      }
+      const optional = c.notnull === 0 ? '?' : '';
+      fields.push(`  ${colName}${optional}: ${tsType};`);
     }
     const ifaceName = name.replace(/(?:^|_)([a-z])/g, (_, c) => c.toUpperCase());
     interfaces.push(`export interface ${ifaceName} {\n${fields.join('\n')}\n}\n`);
   }
+
   const out = `// generated file - do not edit\n\n${interfaces.join('\n')}`;
   const outPath = path.join(process.cwd(), 'types', 'generated-db.ts');
   fs.writeFileSync(outPath, out, 'utf8');

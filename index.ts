@@ -1,8 +1,13 @@
 import express, { Request, Response } from 'express';
 import path from 'path';
 import db from './database.js';
-import type { Prefecture, Site, GoshuinRecord } from './types/db.js';
+import type { Prefectures, Sites, GoshuinRecords } from './types/db.js';
 import multer from 'multer';
+declare global {
+  // PM2 / cluster 二重起動防止用フラグ
+  // eslint-disable-next-line no-var
+  var __APP_LISTENING__ : boolean | undefined;
+}
 
 const app = express();
 const port = 3000;
@@ -33,7 +38,7 @@ app.get('/', (req, res) => {
 app.get('/sites/new', async (req, res) => {
   try {
     // DBから都道府県リストを取得してフォームに渡す
-  const prefectures = await db<Prefecture>('prefectures').select('id', 'name').orderBy('id');
+  const prefectures = await db<Prefectures>('prefectures').select('id', 'name').orderBy('id');
     // フォームを描画
     res.render('sites/new', { title: '新しい寺社を登録', prefectures: prefectures, site: {} });
   } catch (err) {
@@ -48,7 +53,7 @@ app.post('/sites', async (req, res) => {
     const { name, type, prefecture_id, address, lat, lng, description } = req.body;
 
     // DBに新しい寺社を挿入
-  const [newSite] = await db<Site>('sites').insert({
+  const [newSite] = await db<Sites>('sites').insert({
       name,
       type,
       prefecture_id,
@@ -74,7 +79,7 @@ app.post('/sites', async (req, res) => {
 // 寺社一覧ページ
 app.get('/sites', async (req, res) => {
   try {
-  const sites = await db<Site>('sites')
+  const sites = await db<Sites>('sites')
       .join('prefectures', 'sites.prefecture_id', 'prefectures.id')
       .select('sites.id', 'sites.name', 'sites.type', 'prefectures.name as prefecture_name');
 
@@ -88,7 +93,7 @@ app.get('/sites', async (req, res) => {
 // 寺社詳細ページ
 app.get('/sites/:id', async (req, res) => {
   try {
-  const site = await db<Site>('sites')
+  const site = await db<Sites>('sites')
       .join('prefectures', 'sites.prefecture_id', 'prefectures.id')
       .select('sites.*', 'prefectures.name as prefecture_name')
       .where('sites.id', req.params.id)
@@ -98,7 +103,7 @@ app.get('/sites/:id', async (req, res) => {
       return res.status(404).send('寺社が見つかりません');
     }
 
-  const goshuin_records = await db<GoshuinRecord>('goshuin_records')
+  const goshuin_records = await db<GoshuinRecords>('goshuin_records')
       .where('site_id', req.params.id)
       .orderBy('visit_date', 'desc');
 
@@ -112,7 +117,7 @@ app.get('/sites/:id', async (req, res) => {
 // 地図ページ
 app.get('/map', async (req, res) => {
   try {
-  const sitesWithCoords = await db<Site>('sites')
+  const sitesWithCoords = await db<Sites>('sites')
       .whereNotNull('lat')
       .whereNotNull('lng')
       .select('id', 'name', 'lat', 'lng');
@@ -127,7 +132,7 @@ app.get('/map', async (req, res) => {
 // 都道府県一覧ページ
 app.get('/prefectures', async (req, res) => {
   try {
-  const prefectures = await db<Prefecture>('prefectures').select('id', 'name').orderBy('id');
+  const prefectures = await db<Prefectures>('prefectures').select('id', 'name').orderBy('id');
     res.render('prefectures/index', { title: '都道府県から探す', prefectures });
   } catch (err) {
     console.error(err);
@@ -138,11 +143,11 @@ app.get('/prefectures', async (req, res) => {
 // 特定の都道府県に属する寺社一覧ページ
 app.get('/prefectures/:id/sites', async (req, res) => {
   try {
-  const prefecture = await db<Prefecture>('prefectures').where('id', req.params.id).first();
+  const prefecture = await db<Prefectures>('prefectures').where('id', req.params.id).first();
     if (!prefecture) {
       return res.status(404).send('都道府県が見つかりません');
     }
-  const sites = await db<Site>('sites')
+  const sites = await db<Sites>('sites')
       .where('prefecture_id', req.params.id)
       .select('id', 'name', 'type');
 
@@ -198,11 +203,22 @@ app.post('/sites/:id/goshuin', upload.single('image'), async (req, res) => {
 
 // --- サーバーの起動 ---
 // このファイルが直接実行された場合のみ、サーバーを起動する
-// NodeNext: ESMでのエントリ判定
-if (process.argv[1] && process.argv[1].endsWith('/index.js') || process.env.NODE_ENV === 'development' ) {
-  app.listen(port, () => {
-    console.log(`サーバーが http://localhost:${port} で起動しました`);
-  });
+// PM2 / cluster / ESM でも確実に起動させるための判定:
+// 1) 環境変数 FORCE_LISTEN が指定されていれば常に listen
+// 2) NODE_ENV === 'development' なら dev 用に listen
+// 3) それ以外は既にサーバーが開始されていない (簡易フラグ) 場合のみ listen
+// process.env.pm_id が存在する場合 (PM2) でも各ワーカーで listen させる
+const shouldListen = process.env.FORCE_LISTEN === '1' ||
+  process.env.NODE_ENV === 'development' ||
+  !globalThis.__APP_LISTENING__;
+
+if (shouldListen) {
+  if (!globalThis.__APP_LISTENING__) {
+    globalThis.__APP_LISTENING__ = true;
+    app.listen(port, () => {
+      console.log(`サーバーが http://localhost:${port} で起動しました`);
+    });
+  }
 }
 
 // テストのためにappをエクスポート

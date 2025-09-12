@@ -1,5 +1,5 @@
 import request from 'supertest';
-const app = require('../index'); // CommonJS互換のエクスポートを受け取る
+import app from '../index.js';
 
 describe('GET /', () => {
   it('should return 200 OK and render the index page', async () => {
