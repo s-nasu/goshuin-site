@@ -25,4 +25,4 @@ jobs:
       - name: Build
         run: npm run build
       - name: Run tests
-        run: NODE_OPTIONS=--experimental-vm-modules npm test
+        run: npm test

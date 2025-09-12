@@ -1,5 +1,5 @@
 import request from 'supertest';
-import app from '../index.js';
+const app = require('../index.js');
 
 describe('GET /', () => {
   it('should return 200 OK and render the index page', async () => {
